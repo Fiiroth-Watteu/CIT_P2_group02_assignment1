@@ -23,8 +23,15 @@ import { Student, Enrolment, students, courses, enrolments } from './data.js';
  * join. No for loops in this file.
  */
 export function gradeReport(studentId: string): string {
-  // TODO
-  throw new Error('not implemented');
+  //wip
+  //how am i supposed to find the correct course name? how do i compare a courseid from the enrolments with the id of the courses itself to get the course name?
+  const output = enrolments
+  .filter(g => g.studentId === studentId)
+  .map(g => `${g.courseId} ${courses.find(c => c.courseId === g.courseId)?.title}: ${g.grade}`)
+  .join("\n");
+  return output;
+  //what is the question mark after the find() for the courses array?!? why is it needed there????? what does it do with the array? googling for 3 DAYS turns up nothing relating to arrays
+  //throw new Error('not implemented');
 }
 
 // --- A2. Averaging --------------------------------------------------------
@@ -40,8 +47,15 @@ export function gradeReport(studentId: string): string {
  *     averageGrade('00128')   // 11  (12 and 10)
  */
 export function averageGrade(studentId: string): number {
-  // TODO
-  throw new Error('not implemented');
+  //wip
+  //collect the relevant entries for the given studentid that also have grades that are awarded (not null)
+  const input = enrolments.filter(g => g.studentId === studentId && g.grade != null);
+  const output = input
+  .map(g => g = +input);
+  output.reduce(ag => ag / input.length);
+  console.log(output);
+  return output[0];
+  //throw new Error('not implemented');
 }
 
 // --- A3. Who is missing a grade ------------------------------------------
