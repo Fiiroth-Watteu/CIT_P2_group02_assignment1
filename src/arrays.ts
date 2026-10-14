@@ -23,8 +23,14 @@ import { Student, Enrolment, students, courses, enrolments } from './data.js';
  * join. No for loops in this file.
  */
 export function gradeReport(studentId: string): string {
-  // TODO
-  throw new Error('not implemented');
+  const selected = enrolments.filter(e => e.studentId === studentId);
+
+  return selected.map(e => {
+    const course = courses.find(c => c.courseId === e.courseId)!;
+    const grade = e.grade === null ? 'not awarded' : e.grade;
+    return `${course.courseId} ${course.title}: ${grade}`;
+  }).join('\n');
+
 }
 
 // --- A2. Averaging --------------------------------------------------------
@@ -40,8 +46,17 @@ export function gradeReport(studentId: string): string {
  *     averageGrade('00128')   // 11  (12 and 10)
  */
 export function averageGrade(studentId: string): number {
-  // TODO
-  throw new Error('not implemented');
+  const grades = enrolments
+    .filter(e => e.studentId === studentId && e.grade !== null)
+    .map(e => Number(e.grade));
+
+  if (grades.length === 0) {
+    return 0;
+  }
+
+  const total = grades.reduce((sum, grade) => sum + grade, 0);
+  return Math.round((total / grades.length) * 10) / 10;
+
 }
 
 // --- A3. Who is missing a grade ------------------------------------------
@@ -51,8 +66,13 @@ export function averageGrade(studentId: string): number {
  * sorted alphabetically and without repeats.
  */
 export function awaitingGrades(): string[] {
-  // TODO
-  throw new Error('not implemented');
+  
+  const names = enrolments
+    .filter(e => e.grade === null)
+    .map(e => students.find(s => s.id === e.studentId)!.name);
+
+  return [...new Set(names)].sort();
+
 }
 
 // --- A4. A family of formatters ------------------------------------------
@@ -67,8 +87,14 @@ export function awaitingGrades(): string[] {
  * the error the compiler gives you.
  */
 export function formatterFor(style: 'short' | 'long'): (student: Student) => string {
-  // TODO
-  throw new Error('not implemented');
+  
+  if (style === 'short') {
+    return student => student.name;
+  }
+
+  return student =>
+    `${student.name} (${student.deptName}), ${student.totCred} credits`;
+
 }
 
 // --- A5. Changing nothing -------------------------------------------------
@@ -79,6 +105,12 @@ export function formatterFor(style: 'short' | 'long'): (student: Student) => str
  * at all: build new objects with the three dots.
  */
 export function raiseCredits(list: Student[], deptName: string, extra: number): Student[] {
-  // TODO
-  throw new Error('not implemented');
+  
+  return list.map(student => ({
+    ...student,
+    totCred: student.deptName === deptName
+      ? student.totCred + extra
+      : student.totCred
+  }));
+
 }
