@@ -9,7 +9,6 @@
 import { Student, Enrolment, students, courses, enrolments } from './data.js';
 
 // --- A1. The grade report -------------------------------------------------
-// Jeg laver lige en ændring
 /**
  * One line per enrolment of a student, in the order the enrolments appear:
  *
@@ -21,11 +20,45 @@ import { Student, Enrolment, students, courses, enrolments } from './data.js';
  *
  * You need enrolments and courses. filter, map, find, a template literal and
  * join. No for loops in this file.
- */
+*/
+
+/* v1: filter the student's enrolments
+const mine = enrolments.filter(e => e.studentId === studentId);
+console.log(mine);
+
+v2: find one course (fixed id, just to test find)
+const kursus = courses.find(c => c.courseId === 'BIO-101');
+console.log(kursus);
+
+v3: map each enrolment to its course id
+const ider = mine.map(e => e.courseId);
+console.log(ider);
+
+v4: find the course for every enrolment, keep the title
+const titler = mine.map(e => {
+  const kursus = courses.find(c => c.courseId === e.courseId);
+  return kursus?.title;
+});
+console.log(titler);
+
+v5: one line of text per enrolment (now the map in the final version)
+The final version is v5 plus join. */
+
 export function gradeReport(studentId: string): string {
-  // TODO
-  throw new Error('not implemented');
+  /* the student's enrolments (empty array if there are none) */
+  const mine = enrolments.filter(e => e.studentId === studentId);
+
+  const linjer = mine.map(e => {
+    /* an enrolment only has the course id, so look up the course for the title */
+    const kursus = courses.find(c => c.courseId === e.courseId);
+    /* ?? only applies to null, so grades like '02' are left alone */
+    return `${e.courseId} ${kursus?.title}: ${e.grade ?? 'not awarded'}`;
+  });
+
+  /* one block of text, newline between lines ([] gives '') */
+  return linjer.join('\n');
 }
+console.log(gradeReport('98988'));
 
 // --- A2. Averaging --------------------------------------------------------
 
