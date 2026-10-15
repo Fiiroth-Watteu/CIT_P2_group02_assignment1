@@ -6,6 +6,7 @@
 //     npm run build
 //     npm start
 
+import { parse } from 'path';
 import { Student, Enrolment, students, courses, enrolments } from './data.js';
 
 // --- A1. The grade report -------------------------------------------------
@@ -46,9 +47,9 @@ The final version is v5 plus join. */
 
 export function gradeReport(studentId: string): string {
   /* the student's enrolments (empty array if there are none) */
-  const mine = enrolments.filter(e => e.studentId === studentId);
+  const myEnrollments = enrolments.filter(e => e.studentId === studentId);
 
-  const linjer = mine.map(e => {
+  const linjer = myEnrollments.map(e => {
     /* an enrolment only has the course id, so look up the course for the title */
     const kursus = courses.find(c => c.courseId === e.courseId);
     /* ?? only applies to null, so grades like '02' are left alone */
@@ -58,7 +59,6 @@ export function gradeReport(studentId: string): string {
   /* one block of text, newline between lines ([] gives '') */
   return linjer.join('\n');
 }
-console.log(gradeReport('98988'));
 
 // --- A2. Averaging --------------------------------------------------------
 
@@ -73,10 +73,34 @@ console.log(gradeReport('98988'));
  *     averageGrade('00128')   // 11  (12 and 10)
  */
 export function averageGrade(studentId: string): number {
-  // TODO
-  throw new Error('not implemented');
-}
 
+  /* the student's enrolments (empty array if there are none) */
+  const myEnrollments = enrolments.filter(e => e.studentId === studentId);
+  
+  /* a constant that gets all the grades from enrollments without the ones that haven't been graded */
+  //const myEnrollmentsWithGrades = myEnrollments.filter(e => e.grade !== null);
+  /* Constant that takes the grades(as strings) and maps them into an array of numbers. We use radix 10 to use the normal 10-number system */
+  //const gradesAsNumbers = myEnrollmentsWithGrades.map(e => parseInt(e.grade as string, 10));
+
+  const gradesAsNumbers = myEnrollments
+  .map(e => e.grade)                          // e.grade is string | null []
+  .filter((g): g is string => g !== null)    // g is a string[]
+  .map(g => parseInt(g, 10));                // g is now a number[]
+  
+  // If there are no grades, return 0 to avoid division by zero
+  if (gradesAsNumbers.length === 0) {
+    return 0;
+  }
+
+  const initialvalue = 0;
+  
+  // Use reduce to calculate the sum of the grades divided by the number of grades to get the average. The initial value is set to 0.
+  const average = gradesAsNumbers.reduce((acc, grade) => acc + grade / gradesAsNumbers.length, initialvalue );
+  
+  /* Math.round only rounds to whole numbers, so shift one decimal first. Example with grades 0, 10 and 7: average 5.666 -> * 10 = 56.66 -> round = 57 -> / 10 = 5.7 */
+  return Math.round(average * 10) / 10;
+
+}
 // --- A3. Who is missing a grade ------------------------------------------
 
 /**
@@ -84,8 +108,19 @@ export function averageGrade(studentId: string): number {
  * sorted alphabetically and without repeats.
  */
 export function awaitingGrades(): string[] {
-  // TODO
-  throw new Error('not implemented');
+  const names = enrolments
+    /* keep only the enrolments that are still waiting for a grade */
+    .filter(e => e.grade === null)
+    /* look up each student by id and take the name (undefined if not found) */
+    .map(e => students.find(s => s.id === e.studentId)?.name)
+    /* drop the undefined values, so TypeScript knows this is string[] */
+    .filter((n): n is string => n !== undefined);
+
+  /* keep a name only at its first position, so every name appears once */
+  const unique = names.filter((navn, i) => names.indexOf(navn) === i);
+
+  /* localeCompare sorts by language rules; plain sort() compares raw character codes, which puts æ, ø and å in the wrong place */
+  return unique.sort((a, b) => a.localeCompare(b, 'da'));
 }
 
 // --- A4. A family of formatters ------------------------------------------
