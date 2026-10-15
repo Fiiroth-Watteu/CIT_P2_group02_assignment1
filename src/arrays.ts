@@ -22,9 +22,22 @@ import { Student, Enrolment, students, courses, enrolments } from './data.js';
  * You need enrolments and courses. filter, map, find, a template literal and
  * join. No for loops in this file.
  */
+
 export function gradeReport(studentId: string): string {
-  // TODO
-  throw new Error('not implemented');
+  return enrolments
+    .filter((enrolment) => enrolment.studentId === studentId)
+    .map((enrolment) => {
+      const course = courses.find(
+        (course) => course.courseId === enrolment.courseId
+      );
+
+      const grade = enrolment.grade === null
+        ? 'not awarded'
+        : enrolment.grade;
+
+      return `${enrolment.courseId} ${course?.title}: ${grade}`;
+    })
+    .join('\n');
 }
 
 // --- A2. Averaging --------------------------------------------------------
@@ -40,19 +53,42 @@ export function gradeReport(studentId: string): string {
  *     averageGrade('00128')   // 11  (12 and 10)
  */
 export function averageGrade(studentId: string): number {
-  // TODO
-  throw new Error('not implemented');
-}
+  const grades = enrolments
+    .filter(
+      (enrolment) =>
+        enrolment.studentId === studentId &&
+        enrolment.grade !== null
+    )
+    .map((enrolment) => Number(enrolment.grade));
 
+  if (grades.length === 0) {
+    return 0;
+  }
+
+  const total = grades.reduce((sum, grade) => sum + grade, 0);
+  const average = total / grades.length;
+
+  return Math.round(average * 10) / 10;
+}
 // --- A3. Who is missing a grade ------------------------------------------
 
 /**
  * The names of the students who have at least one enrolment without a grade,
  * sorted alphabetically and without repeats.
  */
+
 export function awaitingGrades(): string[] {
-  // TODO
-  throw new Error('not implemented');
+  return [...new Set(
+    enrolments
+      .filter((enrolment) => enrolment.grade === null)
+      .map((enrolment) => {
+       const student = students.find(
+         (student) => student.id === enrolment.studentId
+      );
+        return student?.name;
+      })
+      .filter((name): name is string => name !== undefined)
+  )].sort();
 }
 
 // --- A4. A family of formatters ------------------------------------------
@@ -66,9 +102,14 @@ export function awaitingGrades(): string[] {
  * The style may only be one of two strings. Try passing 'medium' and read
  * the error the compiler gives you.
  */
+
 export function formatterFor(style: 'short' | 'long'): (student: Student) => string {
-  // TODO
-  throw new Error('not implemented');
+  if (style === 'short') {
+    return (student) => student.name;
+  }
+
+  return (student) =>
+    `${student.name} (${student.deptName}), ${student.totCred} credits`;
 }
 
 // --- A5. Changing nothing -------------------------------------------------
@@ -78,7 +119,16 @@ export function formatterFor(style: 'short' | 'long'): (student: Student) => str
  * Everyone else is unchanged, and the students array itself must not change
  * at all: build new objects with the three dots.
  */
+
 export function raiseCredits(list: Student[], deptName: string, extra: number): Student[] {
-  // TODO
-  throw new Error('not implemented');
+  return list.map((student) => {
+    if (student.deptName === deptName) {
+      return {
+        ...student,
+        totCred: student.totCred + extra
+      };
+    }
+
+    return { ...student };
+  });
 }
