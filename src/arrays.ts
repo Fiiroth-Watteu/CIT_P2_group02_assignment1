@@ -6,6 +6,10 @@
 //     npm run build
 //     npm start
 
+// This file contains functions for working with student grades,
+// enrolments, and student information.
+// The functions use array methods to process the data.
+
 import { Student, Enrolment, students, courses, enrolments } from './data.js';
 
 // --- A1. The grade report -------------------------------------------------
@@ -21,6 +25,14 @@ import { Student, Enrolment, students, courses, enrolments } from './data.js';
  *
  * You need enrolments and courses. filter, map, find, a template literal and
  * join. No for loops in this file.
+ */
+
+/**
+ * Creates a grade report for a student.
+ * Filters enrolments using the student ID.
+ * Finds the course title for each enrolment.
+ * Displays "not awarded" if the grade is null.
+ * Joins all report lines with newline characters.
  */
 
 export function gradeReport(studentId: string): string {
@@ -52,6 +64,15 @@ export function gradeReport(studentId: string): string {
  *
  *     averageGrade('00128')   // 11  (12 and 10)
  */
+/**
+ * Calculates the average of a student's awarded grades.
+ * Excludes enrolments where the grade is null.
+ * Converts grade strings into numbers.
+ * Uses reduce() to calculate the total of the grades.
+ * Returns 0 if the student has no awarded grades.
+ * Rounds the average to one decimal place.
+ */
+
 export function averageGrade(studentId: string): number {
   const grades = enrolments
     .filter(
@@ -76,7 +97,13 @@ export function averageGrade(studentId: string): number {
  * The names of the students who have at least one enrolment without a grade,
  * sorted alphabetically and without repeats.
  */
-
+/**
+ * Finds students who have at least one enrolment without a grade.
+ * Filters enrolments where the grade is null.
+ * Finds the names of the students.
+ * Removes duplicate names using Set.
+ * Removes undefined values and sorts the names alphabetically.
+ */
 export function awaitingGrades(): string[] {
   return [...new Set(
     enrolments
@@ -102,7 +129,12 @@ export function awaitingGrades(): string[] {
  * The style may only be one of two strings. Try passing 'medium' and read
  * the error the compiler gives you.
  */
-
+/**
+ * Returns a function that formats student information.
+ * The short style returns only the student's name.
+ * The long style returns the name, department, and total credits.
+ * The returned function takes a Student object as its argument.
+ */
 export function formatterFor(style: 'short' | 'long'): (student: Student) => string {
   if (style === 'short') {
     return (student) => student.name;
@@ -119,7 +151,13 @@ export function formatterFor(style: 'short' | 'long'): (student: Student) => str
  * Everyone else is unchanged, and the students array itself must not change
  * at all: build new objects with the three dots.
  */
-
+/**
+ * Returns a new array with extra credits for a chosen department.
+ * Uses map() to create a new array of students.
+ * Uses the spread operator to copy each student object.
+ * Adds extra credits only to students in the selected department.
+ * Keeps the original student array and objects unchanged.
+ */
 export function raiseCredits(list: Student[], deptName: string, extra: number): Student[] {
   return list.map((student) => {
     if (student.deptName === deptName) {
