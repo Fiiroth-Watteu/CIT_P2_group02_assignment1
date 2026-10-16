@@ -47,15 +47,17 @@ export function gradeReport(studentId: string): string {
  *     averageGrade('00128')   // 11  (12 and 10)
  */
 export function averageGrade(studentId: string): number {
-  //wip
   //collect the relevant entries for the given studentid that also have grades that are awarded (not null)
+
   const input = enrolments.filter(g => g.studentId === studentId && g.grade != null);
-  const output = input
-  .map(g => g = +input);
-  output.reduce(ag => ag / input.length);
-  console.log(output);
-  return output[0];
-  //throw new Error('not implemented');
+  if(input.length == 0) {
+    return 0;
+  }
+  let grades = input.map(g => g.grade)
+  .filter((g): g is string => g != null)
+  .map(g => parseInt(g));
+  const output = grades.reduce((t, ag) => t + ag, 0) / grades.length;
+  return output;
 }
 
 // --- A3. Who is missing a grade ------------------------------------------
@@ -65,8 +67,12 @@ export function averageGrade(studentId: string): number {
  * sorted alphabetically and without repeats.
  */
 export function awaitingGrades(): string[] {
-  // TODO
-  throw new Error('not implemented');
+  // wip
+  const noGradeStudent = enrolments.filter(ng => ng.grade === null)
+  .map(ng => students.filter(ngs => ngs.id === ng.studentId))
+  .filter((ngn): ngn is string => ngn != null)
+  return noGradeNames;
+  //throw new Error('not implemented');
 }
 
 // --- A4. A family of formatters ------------------------------------------
